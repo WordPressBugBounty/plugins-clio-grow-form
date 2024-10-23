@@ -1,13 +1,14 @@
 <?php
 /*
  * Plugin Name: Clio Grow Form
- * Version: 1.0.2
+ * Version: 1.0.3
  * Plugin URI:
  * Description: Creates a short code form to allow leads to be submitted directly into a Clio Grow account.
  * Author: Themis Solutions, Inc.
  * Author URI: https://clio.com
  * Requires at least: 4.0
  * Tested up to: 6.6
+ * License: GPLv2 or later
  *
  * Text Domain: grow-form
  * Domain Path: /lang/
@@ -25,8 +26,6 @@ require_once( 'includes/class-grow-form-settings.php' );
 
 // Load plugin libraries
 require_once( 'includes/lib/class-grow-form-admin-api.php' );
-require_once( 'includes/lib/class-grow-form-post-type.php' );
-require_once( 'includes/lib/class-grow-form-taxonomy.php' );
 
 $plugin_version = '1.0.2';
 /**

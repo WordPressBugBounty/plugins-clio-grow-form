@@ -1,13 +1,13 @@
-=== Clio Grow ===
+=== Clio Grow Form ===
 Contributors: Clio
-Tags: contact form, CRM, Clio Grow, law firm, lawyer, contact, lead tracking, wordpress, plugin
+Tags: Clio, Clio Grow, Law firm, Lawyer, Contact form
 Requires at least: 3.9
 Tested up to: 6.6
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-The Clio Grow plugin for Wordpress enables law firms who use Clio Grow to automatically capture leads from their website or blog into the Clio Grow CRM.
+The Clio Grow Wordpress plugin enables law firms who use Clio Grow to automatically capture leads from their website or blog into the Clio Grow CRM.
 
 == Description ==
 Clio Grow is a law firm CRM and client intake software. It helps law firms keep track of all their potential clients, and intake them with ease using powerful online tools to collect information and e-sign documents.
@@ -32,6 +32,10 @@ Clio Grow is built exclusively for law firms, and this plugin is intended to be 
 No, you must be a Clio Grow user to use the plugin.
 
 == Changelog ==
+
+= 1.0.3 =
+* 2024-10-21
+* security and best practices updates
 
 = 1.0.2 =
 * 2023-02-16
