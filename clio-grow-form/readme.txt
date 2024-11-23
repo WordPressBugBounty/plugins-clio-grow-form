@@ -2,7 +2,7 @@
 Contributors: Clio
 Tags: Clio, Clio Grow, Law firm, Lawyer, Contact form
 Requires at least: 3.9
-Tested up to: 6.6
+Tested up to: 6.7
 Stable tag: 1.0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html

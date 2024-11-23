@@ -7,7 +7,7 @@
  * Author: Themis Solutions, Inc.
  * Author URI: https://clio.com
  * Requires at least: 4.0
- * Tested up to: 6.6
+ * Tested up to: 6.7
  * License: GPLv2 or later
  *
  * Text Domain: grow-form
