@@ -465,6 +465,10 @@ class Grow_Form {
       {
           return 'https://eu.grow.clio.com/inbox_leads';
       }
+      elseif($region == 'us_spm')
+      {
+          return 'https://spm.grow.clio.com/inbox_leads';
+      }
     }
 
     /**

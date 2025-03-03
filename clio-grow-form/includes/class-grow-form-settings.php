@@ -125,7 +125,7 @@ class Grow_Form_Settings {
 					'label'			=> __( 'Grow Region', 'grow-form' ),
 					'description'	=> __( 'Pick the region of your Grow account', 'grow-form' ),
 					'type'			=> 'select',
-					'options'		=> array( 'us' => 'US', 'au' => 'AU', 'ca' => 'CA', 'eu' => 'EU' ),
+					'options'		=> array( 'us' => 'US', 'au' => 'AU', 'ca' => 'CA', 'eu' => 'EU', 'us_spm' => 'US Supermax' ),
 					'default'		=> 'us'
 				),
                 array(
