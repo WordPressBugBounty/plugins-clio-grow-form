@@ -1,9 +1,9 @@
 === Clio Grow Form ===
 Contributors: Clio
 Tags: Clio, Clio Grow, Law firm, Lawyer, Contact form
-Requires at least: 3.9
-Tested up to: 6.7
-Stable tag: 1.0.3
+Requires at least: 4.0
+Tested up to: 6.8
+Stable tag: 1.0.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -32,6 +32,10 @@ Clio Grow is built exclusively for law firms, and this plugin is intended to be 
 No, you must be a Clio Grow user to use the plugin.
 
 == Changelog ==
+
+= 1.0.4 =
+* 2025-08-20
+* Add reCAPTCHA v3 support with v2 fallback
 
 = 1.0.3 =
 * 2024-10-21

@@ -241,6 +241,11 @@ class Grow_Form_Admin_API {
 			'div' => array(
 				'class' => array(),
 				'style' => array()
+			),
+			'a' => array(
+				'href' => array(),
+				'target' => array(),
+				'title' => array()
 			)
 		);
 		echo wp_kses($html, $allowed_tags);
@@ -382,6 +387,11 @@ class Grow_Form_Admin_API {
 			'div' => array(
 				'class' => array(),
 				'style' => array()
+			),
+			'a' => array(
+				'href' => array(),
+				'target' => array(),
+				'title' => array()
 			)
 		);
 		echo wp_kses($field, $allowed_tags);

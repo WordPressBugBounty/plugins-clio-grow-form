@@ -125,7 +125,14 @@ class Grow_Form {
 	 * @return  void
 	 */
 	public function enqueue_scripts () {
-		if(get_option('lf_recaptcha_site_key')) wp_enqueue_script('recaptcha', 'https://www.google.com/recaptcha/api.js', array(), $this->_version, true);
+		if($this->is_recaptcha_v3_configured()) {
+			// Load reCAPTCHA v3 (invisible/render mode)
+			$site_key = get_option('lf_recaptcha_v3_site_key');
+			wp_enqueue_script('recaptcha', 'https://www.google.com/recaptcha/api.js?render=' . urlencode($site_key), array(), $this->_version, true);
+		} elseif($this->is_recaptcha_v2_configured()) {
+			// Load reCAPTCHA v2 (explicit mode)
+			wp_enqueue_script('recaptcha', 'https://www.google.com/recaptcha/api.js', array(), $this->_version, true);
+		}
 	} // End enqueue_scripts ()
 
 	/**
@@ -340,12 +347,19 @@ class Grow_Form {
 					{
 						$lf_disclaimer = esc_textarea( sanitize_text_field( wp_unslash($_POST["lf_disclaimer_checkbox"]) ));
 					}
-								$lf_honeypot = isset($_POST["leave_this_blank_url"]) ? sanitize_text_field( wp_unslash($_POST["leave_this_blank_url"]) ) : '';
-								$lf_honeypot_time = isset($_POST["leave_this_alone"]) ? sanitize_text_field( wp_unslash($_POST["leave_this_alone"]) ) : '';
-					$lf_recaptcha_response = "";
-					if(isset($_POST['g-recaptcha-response']))
+					$lf_honeypot = isset($_POST["leave_this_blank_url"]) ? sanitize_text_field( wp_unslash($_POST["leave_this_blank_url"]) ) : '';
+					$lf_honeypot_time = isset($_POST["leave_this_alone"]) ? sanitize_text_field( wp_unslash($_POST["leave_this_alone"]) ) : '';
+					
+					// Handle reCAPTCHA token based on configuration
+					$lf_recaptcha_token = "";
+					
+					if($this->is_recaptcha_v3_configured() && isset($_POST['recaptcha_v3_token']))
 					{
-						$lf_recaptcha_response = sanitize_text_field(wp_unslash($_POST['g-recaptcha-response']));
+						$lf_recaptcha_token = sanitize_text_field(wp_unslash($_POST['recaptcha_v3_token']));
+					}
+					elseif($this->is_recaptcha_v2_configured() && isset($_POST['g-recaptcha-response']))
+					{
+						$lf_recaptcha_token = sanitize_text_field(wp_unslash($_POST['g-recaptcha-response']));
 					}
 
 					#cant check get_option for empty directly with older versions of php so we assign it first
@@ -364,7 +378,8 @@ class Grow_Form {
                 $errors['disclaimer'] = "<li>Must agree to the disclaimer</li>";
             if(!empty($lf_phone) && strlen(preg_replace('/\D/','',$lf_phone)) == 0) #allow blank but not garbage
                 $errors['phone'] = "<li>Phone is invalid</li>";
-			if(get_option('lf_recaptcha_site_key') && !$this->check_recaptcha($lf_recaptcha_response))
+			// Check reCAPTCHA based on configuration
+			if($this->is_recaptcha_configured() && !$this->check_recaptcha($lf_recaptcha_token))
 				$errors['recaptcha'] = "<li>Please confirm you are not a robot</li>";
 
             if(!empty($errors))
@@ -471,12 +486,12 @@ class Grow_Form {
       }
     }
 
-    /**
-	 * Submit lead to Clio Grow API
-	 * @access  private
-	 * @since   1.0.6
-	 * @return  boolean
-	 */
+        /**
+     * Submit lead to Clio Grow API
+     * @access  private
+     * @since   1.0.6
+     * @return  boolean
+     */
     private function submit_lead($lead)
     {
         $region = get_option('lf_grow_region', 'us');
@@ -567,16 +582,125 @@ class Grow_Form {
     }
 
 	/**
-	 * Check reCAPTCHA response
-	 * @param $recaptcha_response: provided by reCAPTCHA library
+	 * Check if reCAPTCHA v3 is configured
+	 * @return  bool
+	 */
+	private function is_recaptcha_v3_configured()
+	{
+		return !empty(get_option('lf_recaptcha_v3_site_key')) && !empty(get_option('lf_recaptcha_v3_secret_key'));
+	}
+
+	/**
+	 * Check if reCAPTCHA v2 is configured
+	 * @return  bool
+	 */
+	private function is_recaptcha_v2_configured()
+	{
+		return !empty(get_option('lf_recaptcha_site_key')) && !empty(get_option('lf_recaptcha_secret_key'));
+	}
+
+	/**
+	 * Check if any reCAPTCHA is configured
+	 * @return  bool
+	 */
+	private function is_recaptcha_configured()
+	{
+		return $this->is_recaptcha_v3_configured() || $this->is_recaptcha_v2_configured();
+	}
+
+	/**
+	 * Check reCAPTCHA based on configuration (v3 or v2)
+	 * @param $token: reCAPTCHA token (v3 or v2)
+	 * @return  bool
+	 */
+	private function check_recaptcha($token)
+	{
+		if($this->is_recaptcha_v3_configured()) {
+			return $this->check_recaptcha_v3($token);
+		} elseif($this->is_recaptcha_v2_configured()) {
+			return $this->check_recaptcha_v2($token);
+		}
+		
+		$this->log_error("No reCAPTCHA configuration found");
+		return false;
+	}
+
+	/**
+	 * Check reCAPTCHA v3 response
+	 * @param $recaptcha_response: provided by reCAPTCHA v3 library
 	 * @return  bool
 	 */
 
-	private function check_recaptcha($recaptcha_response)
+	private function check_recaptcha_v3($recaptcha_response)
 	{
 		if(empty($recaptcha_response))
 		{
-			$this->log_error("reCAPTCHA check failed: empty g-recaptcha-response passed to POST");
+			$this->log_error("reCAPTCHA v3 check failed: empty recaptcha_v3_token passed to POST");
+			return false;
+		}
+
+	    $url = "https://www.google.com/recaptcha/api/siteverify";
+
+        $array = Array(
+            'secret' => get_option('lf_recaptcha_v3_secret_key'),
+			'response' => $recaptcha_response,
+			'remoteip' => (isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : ''),
+		);
+
+        $args = array(
+            'method' => 'POST',
+            'body' => $array
+        );
+
+        $response = wp_remote_post($url,$args);
+		$body = json_decode($response['body'],true);
+
+        if($body['success'] === true)
+		{
+			// reCAPTCHA v3 returns a score between 0.0 and 1.0
+			// Higher scores indicate more likely human interaction
+			$score = isset($body['score']) ? floatval($body['score']) : 0.0;
+			$minimum_score = 0.3;
+			
+			// Check action matches what we sent
+			$expected_action = 'contact_form_submit';
+			$actual_action = isset($body['action']) ? $body['action'] : '';
+			
+			if($actual_action !== $expected_action)
+			{
+				$this->log_error("reCAPTCHA v3 action mismatch: expected '{$expected_action}', got '{$actual_action}'");
+				return false;
+			}
+			
+			if($score < $minimum_score)
+			{
+				$this->log_error("reCAPTCHA v3 score too low: {$score} (minimum: {$minimum_score})");
+				return false;
+			}
+			
+			return true;
+		}
+        else
+		{
+			if(is_array($body['error-codes']))
+				$this->log_error("reCAPTCHA v3 response failed: ".implode(", ", $body['error-codes']));
+			else
+				$this->log_error("reCAPTCHA v3 response failed: no response codes provided");
+
+			return false;
+		}
+	}
+
+	/**
+	 * Check reCAPTCHA v2 response
+	 * @param $recaptcha_response: provided by reCAPTCHA v2 library
+	 * @return  bool
+	 */
+	private function check_recaptcha_v2($recaptcha_response)
+	{
+		if(empty($recaptcha_response))
+		{
+			$this->log_error("reCAPTCHA v2 check failed: empty g-recaptcha-response passed to POST");
 			return false;
 		}
 
@@ -597,13 +721,13 @@ class Grow_Form {
 		$body = json_decode($response['body'],true);
 
         if($body['success'] === true)
-            return true;
+			return true;
         else
 		{
-			if(is_array($body['error_codes']))
-				$this->log_error("reCAPTCHA response failed: ".implode(", ", $body['error-codes']));
+			if(is_array($body['error-codes']))
+				$this->log_error("reCAPTCHA v2 response failed: ".implode(", ", $body['error-codes']));
 			else
-				$this->log_error("reCAPTCHA response failed: no response codes provided");
+				$this->log_error("reCAPTCHA v2 response failed: no response codes provided");
 
 			return false;
 		}

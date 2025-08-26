@@ -137,20 +137,34 @@ class Grow_Form_Settings {
 					'placeholder'	=> __( 'e.g. UA-XXXXXXXX-Y', 'grow-form' )
 				),
 				array(
+					'id' 			=> 'recaptcha_v3_site_key',
+					'label'			=> __( 'reCAPTCHA v3 Site Key' , 'grow-form' ),
+					'description'	=> __( 'Optional; reCAPTCHA v3 (invisible validation). <a href="https://www.google.com/recaptcha/admin">Click here</a> to obtain keys. If provided, v3 will be used.', 'grow-form' ),
+					'type'			=> 'text',
+					'placeholder'	=> __( 'e.g. 6Lc6kFQiAAAAACc5WzIp0LtWfw2SMBGrPONl7CyH', 'grow-form' )
+				),
+				array(
+					'id' 			=> 'recaptcha_v3_secret_key',
+					'label'			=> __( 'reCAPTCHA v3 Secret Key' , 'grow-form' ),
+					'description'	=> __( 'Optional; reCAPTCHA v3 secret key for server-side validation.', 'grow-form' ),
+					'type'			=> 'text',
+					'placeholder'	=> __( 'e.g. 6Lc6kFQiAAAAADODGzriaANKywI8iGn_RjMgbsct', 'grow-form' )
+				),
+				array(
 					'id' 			=> 'recaptcha_site_key',
-					'label'			=> __( 'reCAPTCHA Site Key' , 'grow-form' ),
-					'description'	=> __( 'Optional; <a href="https://www.google.com/recaptcha/admin">click here</a> to obtain a reCAPTCHA key', 'grow-form' ),
+					'label'			=> __( 'reCAPTCHA v2 Site Key (Fallback)' , 'grow-form' ),
+					'description'	=> __( 'Optional; reCAPTCHA v2 (checkbox validation). Used only if v3 keys are not provided. <a href="https://www.google.com/recaptcha/admin">Click here</a> to obtain keys.', 'grow-form' ),
 					'type'			=> 'text',
 					//'default'		=> '',
-					'placeholder'	=> __( 'e.g. 89sdfafAAAAAFDSEFdsdOILJLJ89', 'grow-form' )
+					'placeholder'	=> __( 'e.g. 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI', 'grow-form' )
 				),
 				array(
 					'id' 			=> 'recaptcha_secret_key',
-					'label'			=> __( 'reCAPTCHA Secret Key' , 'grow-form' ),
-					'description'	=> __( 'Optional; <a href="https://www.google.com/recaptcha/admin">click here</a> to obtain a reCAPTCHA key', 'grow-form' ),
+					'label'			=> __( 'reCAPTCHA v2 Secret Key (Fallback)' , 'grow-form' ),
+					'description'	=> __( 'Optional; reCAPTCHA v2 secret key for server-side validation.', 'grow-form' ),
 					'type'			=> 'text',
 					//'default'		=> '',
-					'placeholder'	=> __( 'e.g. 89sdfafAAAAALKJOIUDFsdf7098', 'grow-form' )
+					'placeholder'	=> __( 'e.g. 6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe', 'grow-form' )
 				),
 				array(
 					'id' 			=> 'thankyou_uri',
@@ -493,7 +507,14 @@ class Grow_Form_Settings {
 	}
 
 	public function settings_section ( $section ) {
-		echo wp_kses('<p> ' . $this->settings[ $section['id'] ]['description'] . '</p>' . "\n", array('p' => array()));
+		echo wp_kses('<p> ' . $this->settings[ $section['id'] ]['description'] . '</p>' . "\n", array(
+			'p' => array(),
+			'a' => array(
+				'href' => array(),
+				'target' => array(),
+				'title' => array()
+			)
+		));
 	}
 
 	/**

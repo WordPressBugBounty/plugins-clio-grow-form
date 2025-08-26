@@ -38,7 +38,14 @@
             <input name="leave_this_blank_url" type="text" value="" id="leave_this_blank"/>
         </div>
 
-		<?php if(get_option('lf_recaptcha_site_key')) { ?>
+		<?php if($this->is_recaptcha_v3_configured()) { ?>
+			<!-- reCAPTCHA v3 (invisible) -->
+			<input type="hidden" name="recaptcha_v3_token" id="recaptcha_v3_token" />
+			<script>
+				window.RECAPTCHA_V3_SITE_KEY = "<?php echo esc_attr(get_option('lf_recaptcha_v3_site_key')); ?>";
+			</script>
+		<?php } elseif($this->is_recaptcha_v2_configured()) { ?>
+			<!-- reCAPTCHA v2 (checkbox) -->
 			<p class="g-recaptcha" data-sitekey="<?php echo esc_attr(get_option('lf_recaptcha_site_key')); ?>"></p>
 		<?php } ?>
 
@@ -49,3 +56,44 @@
         </p>
     </form>
 </div>
+
+<?php if($this->is_recaptcha_v3_configured()) { ?>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('#lf_form_container form');
+    const submitButton = form.querySelector('input[type="submit"]');
+    
+    if (!form || !submitButton) return;
+    
+    // Prevent infinite submission loops
+    let recaptchaProcessed = false;
+    
+    form.addEventListener('submit', function(e) {
+        // Allow normal submission if reCAPTCHA already processed
+        if (recaptchaProcessed) return true;
+        
+        // Intercept submission to process reCAPTCHA first
+        e.preventDefault();
+        
+        if (typeof grecaptcha === 'undefined') {
+            alert('reCAPTCHA not loaded. Please refresh and try again.');
+            return false;
+        }
+        
+        grecaptcha.ready(function() {
+            grecaptcha.execute(window.RECAPTCHA_V3_SITE_KEY, {action: 'contact_form_submit'})
+                .then(function(token) {
+                    document.getElementById('recaptcha_v3_token').value = token;
+                    recaptchaProcessed = true;
+                    // Simulate user clicking submit button to preserve HTML5 validation
+                    // form.submit() would bypass required field checks and other validation
+                    submitButton.click();
+                })
+                .catch(function(error) {
+                    alert('reCAPTCHA verification failed. Please try again.');
+                });
+        });
+    });
+});
+</script>
+<?php } ?>
