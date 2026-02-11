@@ -38,13 +38,14 @@
             <input name="leave_this_blank_url" type="text" value="" id="leave_this_blank"/>
         </div>
 
-		<?php if($this->is_recaptcha_v3_configured()) { ?>
+        <!-- Load reCAPTCHA site key on frontend only (admin preview doesn't need reCAPTCHA) -->
+		<?php if($this->is_recaptcha_v3_configured() && !is_admin()) { ?>
 			<!-- reCAPTCHA v3 (invisible) -->
 			<input type="hidden" name="recaptcha_v3_token" id="recaptcha_v3_token" />
 			<script>
 				window.RECAPTCHA_V3_SITE_KEY = "<?php echo esc_attr(get_option('lf_recaptcha_v3_site_key')); ?>";
 			</script>
-		<?php } elseif($this->is_recaptcha_v2_configured()) { ?>
+		<?php } elseif($this->is_recaptcha_v2_configured() && !is_admin()) { ?>
 			<!-- reCAPTCHA v2 (checkbox) -->
 			<p class="g-recaptcha" data-sitekey="<?php echo esc_attr(get_option('lf_recaptcha_site_key')); ?>"></p>
 		<?php } ?>
@@ -57,7 +58,8 @@
     </form>
 </div>
 
-<?php if($this->is_recaptcha_v3_configured()) { ?>
+<!-- Load reCAPTCHA JavaScript only on frontend (library not available in admin) -->
+<?php if($this->is_recaptcha_v3_configured() && !is_admin()) { ?>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.querySelector('#lf_form_container form');
